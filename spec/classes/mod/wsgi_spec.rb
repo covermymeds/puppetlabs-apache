@@ -57,7 +57,7 @@ describe 'apache::mod::wsgi', :type => :class do
       end
       it {is_expected.to contain_file('wsgi.conf').with_content(/^  WSGIPythonHome "\/path\/to\/virtenv"$/)}
     end
-    describe "with custom package_name and mod_path" do
+    describe "with custom package_name and mod_path and default package_ensure" do
       let :params do
         {
           :package_name => 'mod_wsgi_package',
@@ -69,7 +69,24 @@ describe 'apache::mod::wsgi', :type => :class do
           'path'    => '/foo/bar/baz',
         })
       }
-      it { is_expected.to contain_package("mod_wsgi_package") }
+      it { is_expected.to contain_package("mod_wsgi_package").with_ensure("present") }
+      it { is_expected.to contain_file('wsgi.load').with_content(%r"LoadModule wsgi_module /foo/bar/baz") }
+    end
+    describe "with custom package_name and mod_path and package_ensure" do
+      let :params do
+        {
+          :package_name   => 'mod_wsgi_package',
+          :package_ensure => '1.2.3',
+          :mod_path       => '/foo/bar/baz',
+        }
+      end
+      it { is_expected.to contain_apache__mod('wsgi').with({
+          'package'        => 'mod_wsgi_package',
+          'package_ensure' => '1.2.3',
+          'path'           => '/foo/bar/baz',
+        })
+      }
+      it { is_expected.to contain_package("mod_wsgi_package").with_ensure("1.2.3") }
       it { is_expected.to contain_file('wsgi.load').with_content(%r"LoadModule wsgi_module /foo/bar/baz") }
     end
     describe "with custom mod_path not containing /" do

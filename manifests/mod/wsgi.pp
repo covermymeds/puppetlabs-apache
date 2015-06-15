@@ -3,6 +3,7 @@ class apache::mod::wsgi (
   $wsgi_python_path   = undef,
   $wsgi_python_home   = undef,
   $package_name       = undef,
+  $package_ensure     = 'present',
   $mod_path           = undef,
 ){
 
@@ -17,8 +18,9 @@ class apache::mod::wsgi (
       $_mod_path = "${::apache::lib_path}/${mod_path}"
     }
     ::apache::mod { 'wsgi':
-      package => $package_name,
-      path    => $_mod_path,
+      package        => $package_name,
+      package_ensure => $package_ensure,
+      path           => $_mod_path,
     }
   }
   else {
